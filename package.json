@@ -22,6 +22,7 @@
   "build": {
     "appId": "studio.vidit.app",
     "productName": "Vidit",
+    "icon": "assets/icon.png",
     "artifactName": "Vidit-${version}-${os}-${arch}.${ext}",
     "directories": {
       "output": "release"
