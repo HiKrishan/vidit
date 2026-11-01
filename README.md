@@ -1,5 +1,7 @@
 # Vidit
 
+<p align="center"><img src="assets/icon.png" width="120" alt="Vidit logo"></p>
+
 A lightweight, local-first video editor for Windows. Built with Electron.
 
 ## Features
@@ -31,6 +33,10 @@ npm run dist
 ## Export
 
 Exports render locally — nothing leaves your computer. Text and sticker overlays are rasterized as transparent PNGs and composited by FFmpeg `filter_complex`.
+
+## Contributors
+
+- [Crishan-py](https://github.com/Crishan-py) (author / maintainer)
 
 ## License
 
