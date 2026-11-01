@@ -1,0 +1,1 @@
+[0:v]format=rgba,geq=r='r(X,Y)':g='g(X,Y)':b='b(X,Y)':a='255*min(max((T-0.5)/1.0,0),1)'[v]

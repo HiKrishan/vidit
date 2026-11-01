@@ -1,0 +1,402 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: vidit-media:; media-src 'self' blob: vidit-media:; font-src 'self'; connect-src 'self' vidit-media:; object-src 'none'; base-uri 'none'; form-action 'none'"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vidit</title>
+    <link rel="stylesheet" href="./css/styles.css" />
+  </head>
+  <body>
+    <div class="app-shell" id="appShell">
+      <header class="titlebar" id="titlebar">
+        <div class="brand-block" aria-label="Vidit">
+          <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+            <path d="M4 5.5h7l5 11 5-11h7L19 26.5h-6L4 5.5Z" fill="currentColor" />
+            <path d="M10.5 5.5h4.2l2.8 6.2-2.1 4.6-4.9-10.8Z" fill="var(--accent)" />
+          </svg>
+          <span class="brand-word">vidit</span>
+        </div>
+
+        <div class="project-title-wrap">
+          <span class="project-dot" id="dirtyDot" title="Saved"></span>
+          <input
+            class="project-title-input"
+            id="projectName"
+            value="Untitled edit"
+            spellcheck="false"
+            aria-label="Project name"
+            maxlength="80"
+          />
+          <span class="save-state" id="saveState">Local project</span>
+        </div>
+
+        <div class="titlebar-actions">
+          <div class="history-actions">
+            <button class="icon-btn" id="undoBtn" title="Undo (Ctrl+Z)" aria-label="Undo" disabled>
+              <svg><use href="#i-undo"></use></svg>
+            </button>
+            <button class="icon-btn" id="redoBtn" title="Redo (Ctrl+Shift+Z)" aria-label="Redo" disabled>
+              <svg><use href="#i-redo"></use></svg>
+            </button>
+          </div>
+          <span class="title-divider"></span>
+          <button class="top-menu-btn" id="projectMenuBtn" aria-haspopup="menu" aria-expanded="false">
+            Project
+            <svg class="tiny"><use href="#i-chevron-down"></use></svg>
+          </button>
+          <button class="icon-btn" id="settingsBtn" title="Settings" aria-label="Settings">
+            <svg><use href="#i-settings"></use></svg>
+          </button>
+          <button class="export-btn" id="exportBtn">
+            <svg><use href="#i-upload"></use></svg>
+            Export
+          </button>
+          <div class="window-controls">
+            <button class="window-btn" id="minimizeBtn" title="Minimize" aria-label="Minimize">
+              <svg><use href="#i-win-min"></use></svg>
+            </button>
+            <button class="window-btn" id="maximizeBtn" title="Maximize" aria-label="Maximize">
+              <svg><use href="#i-win-max"></use></svg>
+            </button>
+            <button class="window-btn window-close" id="closeBtn" title="Close" aria-label="Close">
+              <svg><use href="#i-win-close"></use></svg>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <main class="workspace">
+        <nav class="tool-rail" aria-label="Editor tools">
+          <button class="rail-item active" data-tab="media" title="Media">
+            <svg><use href="#i-media"></use></svg>
+            <span>Media</span>
+          </button>
+          <button class="rail-item" data-tab="audio" title="Audio">
+            <svg><use href="#i-music"></use></svg>
+            <span>Audio</span>
+          </button>
+          <button class="rail-item" data-tab="text" title="Text">
+            <svg><use href="#i-text"></use></svg>
+            <span>Text</span>
+          </button>
+          <button class="rail-item" data-tab="stickers" title="Stickers">
+            <svg><use href="#i-smile"></use></svg>
+            <span>Stickers</span>
+          </button>
+          <button class="rail-item" data-tab="effects" title="Effects">
+            <svg><use href="#i-sparkles"></use></svg>
+            <span>Effects</span>
+          </button>
+          <button class="rail-item" data-tab="transitions" title="Transitions">
+            <svg><use href="#i-transition"></use></svg>
+            <span>Transitions</span>
+          </button>
+          <button class="rail-item" data-tab="adjust" title="Adjust">
+            <svg><use href="#i-sliders"></use></svg>
+            <span>Adjust</span>
+          </button>
+          <div class="rail-spacer"></div>
+          <button class="rail-item rail-help" id="shortcutsBtn" title="Keyboard shortcuts">
+            <svg><use href="#i-keyboard"></use></svg>
+            <span>Keys</span>
+          </button>
+        </nav>
+
+        <aside class="library-panel" id="libraryPanel">
+          <div class="panel-head" id="libraryHead"></div>
+          <div class="library-body" id="libraryBody"></div>
+          <div class="panel-resize library-resize" data-resize="library" title="Resize media panel"></div>
+        </aside>
+
+        <section class="stage-column">
+          <div class="stage-topline">
+            <div class="stage-label">
+              <span class="live-dot"></span>
+              Program
+              <span class="stage-meta" id="stageMeta">1920 × 1080 · 30 fps</span>
+            </div>
+            <div class="stage-tools">
+              <button class="mini-tool" id="safeAreaBtn" title="Toggle safe margins">
+                <svg><use href="#i-frame"></use></svg>
+                <span>Margins</span>
+              </button>
+              <button class="mini-tool" id="fullscreenPreviewBtn" title="Full screen preview">
+                <svg><use href="#i-maximize"></use></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="stage-viewport" id="stageViewport">
+            <div class="stage-frame">
+              <div class="stage" id="stage">
+                <div class="stage-background" id="stageBackground"></div>
+                <div class="stage-layers" id="stageLayers"></div>
+                <div class="safe-area" id="safeArea" aria-hidden="true">
+                  <span class="safe-line safe-top"></span>
+                  <span class="safe-line safe-bottom"></span>
+                  <span class="safe-line safe-left"></span>
+                  <span class="safe-line safe-right"></span>
+                </div>
+              </div>
+              <div class="stage-empty" id="stageEmpty">
+                <div class="empty-reel">
+                  <svg viewBox="0 0 80 80" aria-hidden="true">
+                    <rect x="8" y="18" width="64" height="44" rx="5"></rect>
+                    <path d="M8 30h64M8 50h64M20 18v44M60 18v44"></path>
+                    <circle cx="40" cy="40" r="9"></circle>
+                  </svg>
+                </div>
+                <p class="empty-kicker">The cut starts here</p>
+                <h2>Drop footage onto Vidit.</h2>
+                <p class="empty-copy">Import video, images or audio, then drag a clip to the timeline.</p>
+                <button class="empty-import" id="emptyImportBtn">
+                  <svg><use href="#i-plus"></use></svg>
+                  Choose media
+                </button>
+              </div>
+              <div class="drop-overlay" id="dropOverlay">
+                <div class="drop-card">
+                  <svg><use href="#i-download"></use></svg>
+                  <strong>Drop to import</strong>
+                  <span>Video, audio, or images</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="transport">
+            <div class="timecode-block">
+              <span class="timecode" id="timecode">00:00:00:00</span>
+              <span class="duration-code" id="durationCode">/ 00:00:00:00</span>
+            </div>
+            <div class="transport-controls">
+              <button class="transport-btn" id="jumpStartBtn" title="Go to start (Home)" aria-label="Go to start">
+                <svg><use href="#i-skip-back"></use></svg>
+              </button>
+              <button class="transport-btn" id="stepBackBtn" title="Previous frame (,)" aria-label="Previous frame">
+                <svg><use href="#i-step-back"></use></svg>
+              </button>
+              <button class="play-btn" id="playBtn" title="Play (Space)" aria-label="Play">
+                <svg class="play-icon"><use href="#i-play"></use></svg>
+                <svg class="pause-icon"><use href="#i-pause"></use></svg>
+              </button>
+              <button class="transport-btn" id="stepForwardBtn" title="Next frame (.)" aria-label="Next frame">
+                <svg><use href="#i-step-forward"></use></svg>
+              </button>
+              <button class="transport-btn" id="jumpEndBtn" title="Go to end (End)" aria-label="Go to end">
+                <svg><use href="#i-skip-end"></use></svg>
+              </button>
+            </div>
+            <div class="transport-right">
+              <button class="mini-tool transport-mini" id="loopBtn" title="Loop playback">
+                <svg><use href="#i-loop"></use></svg>
+              </button>
+              <button class="mini-tool transport-mini" id="muteMasterBtn" title="Mute preview">
+                <svg class="volume-on"><use href="#i-volume"></use></svg>
+                <svg class="volume-off"><use href="#i-volume-x"></use></svg>
+              </button>
+              <input type="range" class="volume-range" id="masterVolume" min="0" max="100" value="100" title="Preview volume" />
+              <span class="fps-chip" id="fpsChip">30 fps</span>
+            </div>
+          </div>
+        </section>
+
+        <aside class="inspector-panel" id="inspectorPanel">
+          <div class="panel-resize inspector-resize" data-resize="inspector" title="Resize inspector"></div>
+          <div class="inspector-head" id="inspectorHead"></div>
+          <div class="inspector-body" id="inspectorBody"></div>
+        </aside>
+      </main>
+
+      <section class="timeline-panel" id="timelinePanel">
+        <div class="timeline-resize" data-resize="timeline" title="Resize timeline"></div>
+        <div class="timeline-toolbar">
+          <div class="timeline-tool-group">
+            <button class="tool-btn active" id="selectToolBtn" title="Select (V)">
+              <svg><use href="#i-pointer"></use></svg>
+            </button>
+            <button class="tool-btn" id="bladeToolBtn" title="Blade (B)">
+              <svg><use href="#i-scissors"></use></svg>
+            </button>
+            <span class="tool-divider"></span>
+            <button class="tool-btn" id="splitBtn" title="Split at playhead (Ctrl+B)">
+              <svg><use href="#i-split"></use></svg>
+            </button>
+            <button class="tool-btn" id="duplicateBtn" title="Duplicate (Ctrl+D)">
+              <svg><use href="#i-copy"></use></svg>
+            </button>
+            <button class="tool-btn" id="deleteBtn" title="Delete (Del)">
+              <svg><use href="#i-trash"></use></svg>
+            </button>
+          </div>
+
+          <div class="timeline-time">
+            <span id="timelineTime">00:00.0</span>
+            <span class="timeline-time-divider">/</span>
+            <span id="timelineDuration">00:00.0</span>
+          </div>
+
+          <div class="timeline-tool-group timeline-right-tools">
+            <button class="tool-btn active" id="snapBtn" title="Snapping (S)">
+              <svg><use href="#i-magnet"></use></svg>
+            </button>
+            <button class="tool-btn" id="addTrackBtn" title="Add track">
+              <svg><use href="#i-plus-square"></use></svg>
+            </button>
+            <span class="tool-divider"></span>
+            <button class="tool-btn" id="zoomOutBtn" title="Zoom out (Ctrl+-)">
+              <svg><use href="#i-zoom-out"></use></svg>
+            </button>
+            <input type="range" class="zoom-range" id="zoomRange" min="4" max="180" value="45" title="Timeline zoom" />
+            <button class="tool-btn" id="zoomInBtn" title="Zoom in (Ctrl++)">
+              <svg><use href="#i-zoom-in"></use></svg>
+            </button>
+            <button class="tool-btn" id="fitTimelineBtn" title="Fit timeline (F)">
+              <svg><use href="#i-fit"></use></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="timeline-body">
+          <div class="track-head-column">
+            <div class="ruler-corner">
+              <span>Tracks</span>
+              <button class="mini-btn" id="cornerAddTrack" title="Add track">
+                <svg><use href="#i-plus"></use></svg>
+              </button>
+            </div>
+            <div class="track-heads" id="trackHeads"></div>
+          </div>
+          <div class="timeline-scroll" id="timelineScroll">
+            <div class="timeline-content" id="timelineContent">
+              <div class="timeline-ruler" id="timelineRuler"></div>
+              <div class="timeline-lanes" id="timelineLanes"></div>
+              <div class="playhead" id="playhead">
+                <span class="playhead-cap"></span>
+                <span class="playhead-line"></span>
+              </div>
+              <div class="timeline-drop-indicator" id="timelineDropIndicator"></div>
+            </div>
+          </div>
+        </div>
+        <div class="timeline-status" id="timelineStatus">
+          <span id="timelineHint">Drag media here. Snapping is on.</span>
+          <span id="selectionHint"></span>
+        </div>
+      </section>
+    </div>
+
+    <div class="popover project-popover" id="projectMenu" role="menu" hidden>
+      <button data-command="new" role="menuitem"><span>New project</span><kbd>Ctrl N</kbd></button>
+      <button data-command="open" role="menuitem"><span>Open project…</span><kbd>Ctrl O</kbd></button>
+      <button data-command="save" role="menuitem"><span>Save</span><kbd>Ctrl S</kbd></button>
+      <button data-command="save-as" role="menuitem"><span>Save as…</span><kbd>Ctrl ⇧ S</kbd></button>
+      <div class="popover-rule"></div>
+      <button data-command="import" role="menuitem"><span>Add media…</span><kbd>Ctrl I</kbd></button>
+      <button data-command="reveal" id="revealProjectBtn" role="menuitem"><span>Show project file</span></button>
+      <div class="popover-rule"></div>
+      <button data-command="shortcuts" role="menuitem"><span>Keyboard shortcuts</span><kbd>?</kbd></button>
+      <button data-command="settings" role="menuitem"><span>Settings</span></button>
+    </div>
+
+    <div class="toast-stack" id="toastStack" aria-live="polite"></div>
+
+    <div class="modal-root" id="modalRoot" hidden>
+      <div class="modal-backdrop" data-modal-close></div>
+      <div class="modal-shell" id="modalShell" role="dialog" aria-modal="true">
+        <div class="modal-head">
+          <div>
+            <p class="modal-kicker" id="modalKicker">Vidit</p>
+            <h2 class="modal-title" id="modalTitle">Dialog</h2>
+          </div>
+          <button class="icon-btn modal-close" data-modal-close aria-label="Close dialog">
+            <svg><use href="#i-close"></use></svg>
+          </button>
+        </div>
+        <div class="modal-body" id="modalBody"></div>
+        <div class="modal-actions" id="modalActions"></div>
+      </div>
+    </div>
+
+    <div class="context-menu" id="contextMenu" hidden></div>
+
+    <svg class="svg-sprite" aria-hidden="true">
+      <symbol id="i-undo" viewBox="0 0 24 24"><path d="M9 7 4 12l5 5"/><path d="M4 12h9a6 6 0 0 1 6 6v1"/></symbol>
+      <symbol id="i-redo" viewBox="0 0 24 24"><path d="m15 7 5 5-5 5"/><path d="M20 12h-9a6 6 0 0 0-6 6v1"/></symbol>
+      <symbol id="i-chevron-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+      <symbol id="i-chevron-right" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></symbol>
+      <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1.08-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 8.92a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></symbol>
+      <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></symbol>
+      <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v12"/><path d="m7 11 5 5 5-5"/><path d="M4 20h16"/></symbol>
+      <symbol id="i-win-min" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+      <symbol id="i-win-max" viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="1"/></symbol>
+      <symbol id="i-win-restore" viewBox="0 0 24 24"><rect x="8" y="5" width="11" height="11" rx="1"/><path d="M5 8v10a1 1 0 0 0 1 1h10"/></symbol>
+      <symbol id="i-win-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+      <symbol id="i-media" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m7 15 3-3 2.5 2.5L15 12l2 3"/><circle cx="8.5" cy="9" r="1"/></symbol>
+      <symbol id="i-music" viewBox="0 0 24 24"><path d="M9 18V5l10-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="16" cy="16" r="3"/></symbol>
+      <symbol id="i-text" viewBox="0 0 24 24"><path d="M5 6V4h14v2"/><path d="M12 4v16"/><path d="M9 20h6"/></symbol>
+      <symbol id="i-smile" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8.5 14.5a4.2 4.2 0 0 0 7 0"/><path d="M9 9h.01M15 9h.01"/></symbol>
+      <symbol id="i-sparkles" viewBox="0 0 24 24"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3Z"/><path d="m19 16 .8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8L19 16Z"/><path d="m5 3 .6 1.6L7 5l-1.4.6L5 7l-.6-1.4L3 5l1.4-.4L5 3Z"/></symbol>
+      <symbol id="i-transition" viewBox="0 0 24 24"><rect x="3" y="5" width="9" height="14" rx="1.5"/><rect x="12" y="5" width="9" height="14" rx="1.5"/><path d="M8 12h8"/><path d="m13 9 3 3-3 3"/></symbol>
+      <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 6h7M15 6h5"/><circle cx="13" cy="6" r="2"/><path d="M4 12h4M12 12h8"/><circle cx="10" cy="12" r="2"/><path d="M4 18h10M18 18h2"/><circle cx="16" cy="18" r="2"/></symbol>
+      <symbol id="i-keyboard" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M6 10h1M9 10h1M12 10h1M15 10h1M18 10h1M6 14h1M9 14h1M12 14h1M15 14h1M18 14h1"/></symbol>
+      <symbol id="i-frame" viewBox="0 0 24 24"><path d="M4 9V5a1 1 0 0 1 1-1h4M15 4h4a1 1 0 0 1 1 1v4M20 15v4a1 1 0 0 1-1 1h-4M9 20H5a1 1 0 0 1-1-1v-4"/></symbol>
+      <symbol id="i-maximize" viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3"/></symbol>
+      <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+      <symbol id="i-skip-back" viewBox="0 0 24 24"><path d="M18 5 8 12l10 7V5Z"/><path d="M5 5v14"/></symbol>
+      <symbol id="i-skip-end" viewBox="0 0 24 24"><path d="m6 5 10 7-10 7V5Z"/><path d="M19 5v14"/></symbol>
+      <symbol id="i-step-back" viewBox="0 0 24 24"><path d="m14 6-6 6 6 6"/><path d="M18 6v12"/></symbol>
+      <symbol id="i-step-forward" viewBox="0 0 24 24"><path d="m10 6 6 6-6 6"/><path d="M6 6v12"/></symbol>
+      <symbol id="i-play" viewBox="0 0 24 24"><path d="m8 5 11 7-11 7V5Z" fill="currentColor" stroke="none"/></symbol>
+      <symbol id="i-pause" viewBox="0 0 24 24"><rect x="7" y="5" width="3.5" height="14" rx="1" fill="currentColor" stroke="none"/><rect x="13.5" y="5" width="3.5" height="14" rx="1" fill="currentColor" stroke="none"/></symbol>
+      <symbol id="i-loop" viewBox="0 0 24 24"><path d="M17 3l3 3-3 3"/><path d="M4 12V9a3 3 0 0 1 3-3h13"/><path d="m7 21-3-3 3-3"/><path d="M20 12v3a3 3 0 0 1-3 3H4"/></symbol>
+      <symbol id="i-volume" viewBox="0 0 24 24"><path d="M11 5 6 9H3v6h3l5 4V5Z"/><path d="M15 9a4 4 0 0 1 0 6M18 6a8 8 0 0 1 0 12"/></symbol>
+      <symbol id="i-volume-x" viewBox="0 0 24 24"><path d="M11 5 6 9H3v6h3l5 4V5Z"/><path d="m16 9 5 6M21 9l-5 6"/></symbol>
+      <symbol id="i-pointer" viewBox="0 0 24 24"><path d="m5 3 14 9-7 2-3 7L5 3Z"/></symbol>
+      <symbol id="i-scissors" viewBox="0 0 24 24"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M8.2 8.2 20 20M20 4 8.2 15.8"/></symbol>
+      <symbol id="i-split" viewBox="0 0 24 24"><path d="M12 3v18"/><path d="M4 8h4M4 16h4M16 8h4M16 16h4"/><path d="m9 12 3-3 3 3"/></symbol>
+      <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></symbol>
+      <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6"/><path d="M6 7l1 13h10l1-13M9 7V4h6v3"/></symbol>
+      <symbol id="i-magnet" viewBox="0 0 24 24"><path d="m6 3 4 2-2 4"/><path d="M18 3l-4 2 2 4"/><path d="M6 7h12v5a6 6 0 0 1-12 0V7Z"/><path d="M6 11h4M14 11h4"/></symbol>
+      <symbol id="i-plus-square" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M12 8v8M8 12h8"/></symbol>
+      <symbol id="i-zoom-out" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m16 16 5 5M8 11h6"/></symbol>
+      <symbol id="i-zoom-in" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m16 16 5 5M8 11h6M11 8v6"/></symbol>
+      <symbol id="i-fit" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/><path d="M8 12h8"/></symbol>
+      <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="3"/></symbol>
+      <symbol id="i-eye-off" viewBox="0 0 24 24"><path d="M3 3l18 18"/><path d="M10.6 6.1A9.8 9.8 0 0 1 12 6c6 0 9.5 6 9.5 6a15.8 15.8 0 0 1-3.1 3.8M6.3 6.3C3.9 8 2.5 12 2.5 12S6 18 12 18a9.6 9.6 0 0 0 4.1-.9"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></symbol>
+      <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></symbol>
+      <symbol id="i-unlock" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 7.4-2"/></symbol>
+      <symbol id="i-mute-track" viewBox="0 0 24 24"><path d="M11 5 6 9H3v6h3l5 4V5Z"/><path d="m16 10 5 5M21 10l-5 5"/></symbol>
+      <symbol id="i-film" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4"/></symbol>
+      <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9" r="1.5"/><path d="m4 18 5-5 3 3 3-4 5 6"/></symbol>
+      <symbol id="i-wave" viewBox="0 0 24 24"><path d="M3 12h2l1-5 2 10 2-13 2 16 2-11 2 8 2-5 2 2h2"/></symbol>
+      <symbol id="i-record" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4" fill="currentColor" stroke="none"/></symbol>
+      <symbol id="i-stop" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2" fill="currentColor" stroke="none"/></symbol>
+      <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m16 16 5 5"/></symbol>
+      <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z"/></symbol>
+      <symbol id="i-save" viewBox="0 0 24 24"><path d="M5 3h11l3 3v15H5V3Z"/><path d="M8 3v6h8V3M8 21v-7h8v7"/></symbol>
+      <symbol id="i-check" viewBox="0 0 24 24"><path d="m4 12 5 5L20 6"/></symbol>
+      <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+      <symbol id="i-external" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9"/><path d="M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"/></symbol>
+      <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7h.01"/></symbol>
+      <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3 2.5 20h19L12 3Z"/><path d="M12 9v5M12 17h.01"/></symbol>
+      <symbol id="i-file" viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6V3Z"/><path d="M14 3v5h5"/></symbol>
+      <symbol id="i-more" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1.2" fill="currentColor" stroke="none"/></symbol>
+      <symbol id="i-arrow-left" viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></symbol>
+      <symbol id="i-arrow-right" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+      <symbol id="i-check-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></symbol>
+      <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 6v5h-5"/><path d="M4 18v-5h5"/><path d="M6.1 9A7 7 0 0 1 18.5 7.5L20 11M4 13l1.5 3.5A7 7 0 0 0 17.9 15"/></symbol>
+      <symbol id="i-grip" viewBox="0 0 24 24"><circle cx="9" cy="6" r="1"/><circle cx="15" cy="6" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="9" cy="18" r="1"/><circle cx="15" cy="18" r="1"/></symbol>
+      <symbol id="i-sticker" viewBox="0 0 24 24"><path d="M4 4h16v10l-6 6H4V4Z"/><path d="M20 14h-6v6"/><path d="M8 9h.01M16 9h.01M8 13c1.2 1.5 2.5 2.2 4 2.2s2.8-.7 4-2.2"/></symbol>
+      <symbol id="i-camera" viewBox="0 0 24 24"><path d="M4 7h4l2-2h4l2 2h4v12H4V7Z"/><circle cx="12" cy="13" r="3.5"/></symbol>
+      <symbol id="i-broom" viewBox="0 0 24 24"><path d="m14 4 6 6M13 5l6 6-5 5-6-6 5-5Z"/><path d="M8 10 3 21l11-5"/></symbol>
+    </svg>
+
+    <script src="./js/error-guard.js"></script>
+    <script type="module" src="./js/app.js"></script>
+  </body>
+</html>
